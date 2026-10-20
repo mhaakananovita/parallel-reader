@@ -2,6 +2,19 @@ import type { Reading, ReadingStage } from "@/lib/types";
 
 const STORAGE_KEY = "parallel-reader-readings";
 
+export function deleteReading(id: string) {
+  const readings = getSavedReadings();
+
+  const updated = readings.filter(
+    (reading) => reading.id !== id
+  );
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(updated)
+  );
+}
+
 export function getSavedReadings(): Reading[] {
   const stored = localStorage.getItem(STORAGE_KEY);
 

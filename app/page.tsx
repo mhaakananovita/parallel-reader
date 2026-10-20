@@ -5,7 +5,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import type { Reading } from "@/lib/types";
-import { getSavedReadings, saveReading, updateReadingNotes, updateReadingStage, } from "@/lib/storage";
+import { deleteReading, getSavedReadings, saveReading, updateReadingNotes, updateReadingStage, } from "@/lib/storage";
 import GeneratorForm from "@/components/GeneratorForm";
 import Library from "@/components/Library";
 import Reader from "@/components/Reader";
@@ -139,6 +139,17 @@ function changeNotes(notes: string) {
   setSavedReadings(getSavedReadings());
 }
 
+function removeReading(id: string) {
+  deleteReading(id);
+  setSavedReadings(getSavedReadings());
+
+  if (reading?.id === id) {
+    setReading(null);
+    setView("library");
+  }
+}
+
+
 function changeStage(stage: Reading["stage"]) {
   if (!reading) {
     return;
@@ -179,13 +190,14 @@ function changeStage(stage: Reading["stage"]) {
       <h1>Parallel Reader</h1>
 
 {view === "library" && (
-  <Library
-    readings={savedReadings}
-    onSelect={(selectedReading) => {
-      setReading(selectedReading);
-      setView("reader");
-    }}
-  />
+<Library
+  readings={savedReadings}
+  onSelect={(selectedReading) => {
+    setReading(selectedReading);
+    setView("reader");
+  }}
+  onDelete={removeReading}
+/>
 )}
 
 {view === "new" && (
@@ -220,6 +232,7 @@ function changeStage(stage: Reading["stage"]) {
       setReading(selectedReading);
       setView("reader");
     }}
+    onDelete={removeReading}
   />
 )}
     </main>
