@@ -12,10 +12,11 @@ export function getSavedReadings(): Reading[] {
   const readings = JSON.parse(stored) as Reading[];
 
   return readings.map((reading) => ({
-    ...reading,
-    stage: reading.stage ?? "new",
-notes: reading.notes ?? "",
-  }));
+  ...reading,
+  level: reading.level ?? "",
+  stage: reading.stage ?? "new",
+  notes: reading.notes ?? "",
+}));
 }
 
 export function saveReading(reading: Reading) {

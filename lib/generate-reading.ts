@@ -58,6 +58,7 @@ return {
   title: generated.title,
   sourceLanguage: request.sourceLanguage,
   translationLanguage: request.translationLanguage,
+  level: request.level ?? "",
   stage: "new",
   notes: "",
   blocks: generated.blocks,

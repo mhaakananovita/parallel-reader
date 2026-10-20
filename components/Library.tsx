@@ -87,7 +87,8 @@ const filteredReadings = readings.filter((reading) => {
         key={reading.id}
         onClick={() => onSelect(reading)}
       >
-        {reading.title}{" "}
+{reading.title}
+{reading.level && ` (${reading.level})`}
         <span className={styles.stage}>
           — {reading.stage}
         </span>

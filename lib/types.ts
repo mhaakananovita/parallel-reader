@@ -18,6 +18,7 @@ export type Reading = {
   stage: ReadingStage;
   notes: string;
   blocks: ReadingBlock[];
+level: string;
 };
 
 export type GenerateReadingRequest = {

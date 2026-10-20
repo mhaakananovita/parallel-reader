@@ -16,7 +16,7 @@ export default function Home() {
   const [sourceLanguage, setSourceLanguage] = useState("French");
   const [translationLanguage, setTranslationLanguage] = useState("Swedish");
   const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState("B1");
+  const [level, setLevel] = useState("");
 const [view, setView] = useState<View>("library");
 
   const [reading, setReading] = useState<Reading | null>(null);
@@ -165,11 +165,16 @@ function changeStage(stage: Reading["stage"]) {
   </button>
 
   <button
-    className={view === "new" ? styles.activeNav : ""}
-    onClick={() => setView("new")}
-  >
-    New reading
-  </button>
+  className={view === "new" ? styles.activeNav : ""}
+  onClick={() => {
+    setTopic("");
+    setLevel("");
+    setView("new");
+  }}
+>
+  New reading
+</button>
+
 </nav>
       <h1>Parallel Reader</h1>
 
