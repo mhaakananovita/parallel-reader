@@ -1,0 +1,141 @@
+.reader {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #ddd;
+}
+
+.title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.15;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.field select {
+  min-width: 180px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+}
+
+.notes {
+  margin: 1.5rem 0;
+}
+
+.notes label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.notes textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.audio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.audio button {
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #222;
+  color: white;
+  font-weight: 600;
+}
+
+.audio button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.audio audio {
+  max-width: 100%;
+}
+
+.languageHeaders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 0 0 0.75rem;
+  border-bottom: 2px solid #222;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.block p {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.block p:first-child {
+  color: #111;
+}
+
+.block p:last-child {
+  color: #555;
+}
+
+@media (max-width: 700px) {
+  .reader {
+    margin-top: 2rem;
+  }
+
+  .languageHeaders {
+    display: none;
+  }
+
+  .block {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+    padding: 1.25rem 0;
+  }
+
+  .block p:last-child {
+    font-size: 1rem;
+  }
+}
