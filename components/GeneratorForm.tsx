@@ -51,18 +51,34 @@ export default function GeneratorForm({
     </label>
   </div>
 
-  <div className={styles.field}>
-    <label>
-      Topic
-      <input
-        value={topic}
-        onChange={(event) =>
-          onTopicChange(event.target.value)
-        }
-      />
-    </label>
-  </div>
-
+<div className={styles.field}>
+  <label>
+    Topic
+    <select
+      value={topic}
+      onChange={(event) => onTopicChange(event.target.value)}
+    >
+      <option value="Everyday life">Everyday life</option>
+      <option value="History">History</option>
+      <option value="Society">Society</option>
+      <option value="Food & drink">Food & drink</option>
+      <option value="Travel">Travel</option>
+      <option value="Work">Work</option>
+      <option value="Culture">Culture</option>
+      <option value="Nature">Nature</option>
+      <option value="Science & technology">
+        Science & technology
+      </option>
+      <option value="Sports">Sports</option>
+      <option value="People & relationships">
+        People & relationships
+      </option>
+      <option value="Mystery / unusual events">
+        Mystery / unusual events
+      </option>
+    </select>
+  </label>
+</div>
 <div className={styles.field}>
   <label>
     Level

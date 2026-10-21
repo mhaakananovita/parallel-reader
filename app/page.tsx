@@ -15,7 +15,6 @@ type View = "library" | "new" | "reader";
 export default function Home() {
   const [sourceLanguage, setSourceLanguage] = useState("French");
   const [translationLanguage, setTranslationLanguage] = useState("Swedish");
-  const [topic, setTopic] = useState("");
   const [level, setLevel] = useState("");
 const [view, setView] = useState<View>("library");
 
@@ -25,6 +24,7 @@ const [view, setView] = useState<View>("library");
 const [audioUrl, setAudioUrl] = useState<string | null>(null);
 const [audioLoading, setAudioLoading] = useState(false);
 const [savedReadings, setSavedReadings] = useState<Reading[]>([]);
+const [topic, setTopic] = useState("Everyday life");
 
 useEffect(() => {
   setSavedReadings(getSavedReadings());
@@ -187,8 +187,82 @@ function changeStage(stage: Reading["stage"]) {
 </button>
 
 </nav>
-      <h1>Parallel Reader</h1>
+      <h1>EchoText</h1>
+<section className={styles.homeIntro}>
+  <div className={styles.hero}>
+    <p className={styles.eyebrow}>Language learning, stripped down</p>
 
+    <h1>EchoText</h1>
+
+    <p className={styles.lead}>
+      Read a text. Compare it with a translation. Listen to it. Come back
+      to it a few times. That&apos;s basically the idea.
+    </p>
+
+    <p>
+      EchoText is a deliberately simple tool for learning languages
+      through reading, listening and repetition — without turning every
+      sentence into a quiz.
+    </p>
+  </div>
+
+  <div className={styles.features}>
+    <h2>What it does</h2>
+
+    <ul>
+      <li>Creates short texts at roughly the level you choose.</li>
+      <li>Shows source text and translation side by side.</li>
+      <li>Generates audio for listening and shadowing.</li>
+      <li>Saves readings so you can return to them later.</li>
+      <li>Lets you keep simple notes and track where you are with a text.</li>
+    </ul>
+  </div>
+
+  <div className={styles.faq}>
+    <h2>Small FAQ</h2>
+
+    <details>
+      <summary>Is this another language-learning course?</summary>
+      <p>
+        No. It does not teach a fixed curriculum. Think of it more as a
+        reading and listening workbench.
+      </p>
+    </details>
+
+    <details>
+      <summary>Does it explain every word?</summary>
+      <p>
+        Nope. The translation is there when you need it, but the point is
+        to spend time with the text rather than click every unfamiliar word.
+      </p>
+    </details>
+
+    <details>
+      <summary>Are there quizzes, streaks and points?</summary>
+      <p>
+        Not at the moment, and that is fairly intentional. Reading a decent
+        story is allowed to be enough.
+      </p>
+    </details>
+
+    <details>
+      <summary>Is the translation always perfect?</summary>
+      <p>
+        No. The texts and translations are AI-generated, so occasional oddities
+        are possible. Treat them as learning material, not sacred scripture.
+      </p>
+    </details>
+
+    <details>
+      <summary>What is it actually good for?</summary>
+      <p>
+        Repeated reading, listening, shadowing and getting comfortable with
+        real sentences in context — especially when used alongside grammars,
+        exercise books and other less glamorous but useful things.
+      </p>
+    </details>
+  </div>
+</section>
 {view === "library" && (
 <Library
   readings={savedReadings}

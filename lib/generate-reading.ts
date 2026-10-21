@@ -34,6 +34,18 @@ Divide both versions into matching blocks.
 Each source block must correspond exactly to the translation block
 at the same position.
 
+Vary the form and setting of the readings.
+
+Most readings can be narrative prose, but where natural, use dialogue,
+conversation, letters, diary entries, interviews, short scenes, or other
+simple forms.
+
+Do not make every text resemble a school textbook or informational article.
+
+Prefer concrete situations, people, events, and small stories.
+
+The selected topic is a broad theme, not a required essay subject.
+
 Do not add vocabulary notes, explanations, exercises, pronunciation
 guides, quizzes, or teaching commentary.
 `,
