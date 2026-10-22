@@ -1,5 +1,6 @@
 import type { Reading } from "@/lib/types";
 import styles from "./Reader.module.css";
+import { useState } from "react";
 
 type ReaderProps = {
   reading: Reading;
@@ -18,6 +19,7 @@ export default function Reader({
   onStageChange,
   onNotesChange,
 }: ReaderProps) {
+const [notesOpen, setNotesOpen] = useState(false);
   return (
     <section className={styles.reader}>
       <h2 className={styles.title}>{reading.title}</h2>
@@ -41,16 +43,36 @@ export default function Reader({
         </div>
       </div>
 
-      <div className={styles.notes}>
-        <label>Notes</label>
+      <button
+  className={styles.notesButton}
+  onClick={() => setNotesOpen(true)}
+  type="button"
+>
+  Notes
+</button>
 
-        <textarea
-          value={reading.notes}
-          onChange={(event) => onNotesChange(event.target.value)}
-          rows={5}
-          placeholder="Add notes about this reading..."
-        />
-      </div>
+{notesOpen && (
+  <div className={styles.notesPanel}>
+    <div className={styles.notesPanelHeader}>
+      <h3>Notes</h3>
+
+      <button
+  className={styles.closeButton}
+        type="button"
+        onClick={() => setNotesOpen(false)}
+      >
+        Close
+      </button>
+    </div>
+
+    <textarea
+      value={reading.notes}
+      onChange={(event) => onNotesChange(event.target.value)}
+      rows={12}
+      placeholder="Add notes about this reading..."
+    />
+  </div>
+)}
 
       <div className={styles.audio}>
         <button onClick={onGenerateAudio} disabled={audioLoading}>

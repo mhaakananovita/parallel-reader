@@ -139,3 +139,65 @@
     font-size: 1rem;
   }
 }
+
+.notesButton {
+  position: fixed;
+  bottom: 1.5rem;
+right: 1.5rem
+  margin-left: auto;
+  display: block;
+  padding: 0.7rem 1rem;
+  border: 1px solid #222;
+  border-radius: 999px;
+  background: #222;
+  color: white;
+  z-index: 10;
+}
+
+.notesPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 90vw);
+  height: 100vh;
+  padding: 1.5rem;
+  background: white;
+  border-left: 1px solid #ddd;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.notesPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.notesPanelHeader h3 {
+  margin: 0;
+}
+
+.notesPanel textarea {
+  width: 100%;
+  min-height: 320px;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font: inherit;
+}
+
+.closeButton {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f7f7f5;
+  color: #222;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: #ececea;
+}

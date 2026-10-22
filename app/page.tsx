@@ -2,7 +2,7 @@
 
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import type { Reading } from "@/lib/types";
 import { deleteReading, getSavedReadings, saveReading, updateReadingNotes, updateReadingStage, } from "@/lib/storage";
@@ -25,10 +25,51 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
 const [audioLoading, setAudioLoading] = useState(false);
 const [savedReadings, setSavedReadings] = useState<Reading[]>([]);
 const [topic, setTopic] = useState("Everyday life");
+const notesSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+async function loadReadings() {
+  try {
+    const response = await fetch("/api/readings");
+
+    if (!response.ok) {
+      throw new Error("Failed to load readings from database.");
+    }
+
+    const databaseReadings = (await response.json()) as Reading[];
+
+    const localReadings = getSavedReadings();
+
+    const combined = [
+      ...databaseReadings,
+      ...localReadings.filter(
+        (local) =>
+          !databaseReadings.some(
+            (database) => database.id === local.id
+          )
+      ),
+    ];
+
+    setSavedReadings(combined);
+  } catch (error) {
+    console.error(error);
+
+    // Fall back to localStorage if Supabase is unavailable.
+    setSavedReadings(getSavedReadings());
+  }
+}
 
 useEffect(() => {
-  setSavedReadings(getSavedReadings());
+  return () => {
+    if (notesSaveTimer.current) {
+      clearTimeout(notesSaveTimer.current);
+    }
+  };
 }, []);
+
+useEffect(() => {
+  loadReadings();
+}, []);
+
 useEffect(() => {
   setAudioUrl(null);
 }, [reading?.id]);
@@ -39,6 +80,43 @@ useEffect(() => {
     }
   };
 }, [audioUrl]);
+
+async function saveReadingToDatabase(reading: Reading) {
+  const response = await fetch("/api/readings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(reading),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to save reading to database.");
+  }
+}
+
+async function updateReadingInDatabase(
+  id: string,
+  updates: {
+    stage?: Reading["stage"];
+    notes?: string;
+  }
+) {
+  const response = await fetch("/api/readings", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+      ...updates,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update reading in database.");
+  }
+}
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,8 +146,17 @@ useEffect(() => {
       }
 
       setReading(data);
+
 saveReading(data);
-setSavedReadings(getSavedReadings());
+
+try {
+  await saveReadingToDatabase(data);
+} catch (error) {
+  console.error(error);
+}
+
+await loadReadings();
+
 setView("reader");
 
     } catch (error) {
@@ -136,7 +223,19 @@ function changeNotes(notes: string) {
 
   setReading(updatedReading);
   updateReadingNotes(reading.id, notes);
-  setSavedReadings(getSavedReadings());
+
+  if (notesSaveTimer.current) {
+    clearTimeout(notesSaveTimer.current);
+  }
+
+  notesSaveTimer.current = setTimeout(async () => {
+    try {
+      await updateReadingInDatabase(reading.id, { notes });
+      await loadReadings();
+    } catch (error) {
+      console.error(error);
+    }
+  }, 800);
 }
 
 function removeReading(id: string) {
@@ -150,7 +249,7 @@ function removeReading(id: string) {
 }
 
 
-function changeStage(stage: Reading["stage"]) {
+async function changeStage(stage: Reading["stage"]) {
   if (!reading) {
     return;
   }
@@ -162,7 +261,14 @@ function changeStage(stage: Reading["stage"]) {
 
   setReading(updatedReading);
   updateReadingStage(reading.id, stage);
-  setSavedReadings(getSavedReadings());
+
+  try {
+    await updateReadingInDatabase(reading.id, { stage });
+  } catch (error) {
+    console.error(error);
+  }
+
+  await loadReadings();
 }
 
 return (
