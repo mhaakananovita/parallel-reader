@@ -5,12 +5,13 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import type { Reading } from "@/lib/types";
-import { deleteReading, getSavedReadings, saveReading, updateReadingNotes, updateReadingStage, } from "@/lib/storage";
 import GeneratorForm from "@/components/GeneratorForm";
 import Library from "@/components/Library";
 import Reader from "@/components/Reader";
+import AuthPanel from "@/components/AuthPanel";
 
 type View = "home" | "library" | "new" | "reader";
+
 
 export default function Home() {
   const [sourceLanguage, setSourceLanguage] = useState("French");
@@ -27,9 +28,28 @@ const [savedReadings, setSavedReadings] = useState<Reading[]>([]);
 const [topic, setTopic] = useState("Everyday life");
 const notesSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+async function deleteReadingFromDatabase(id: string) {
+  const response = await fetch("/api/readings", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete reading.");
+  }
+}
+
 async function loadReadings() {
   try {
     const response = await fetch("/api/readings");
+
+    if (response.status === 401) {
+      setSavedReadings([]);
+      return;
+    }
 
     if (!response.ok) {
       throw new Error("Failed to load readings from database.");
@@ -37,27 +57,12 @@ async function loadReadings() {
 
     const databaseReadings = (await response.json()) as Reading[];
 
-    const localReadings = getSavedReadings();
-
-    const combined = [
-      ...databaseReadings,
-      ...localReadings.filter(
-        (local) =>
-          !databaseReadings.some(
-            (database) => database.id === local.id
-          )
-      ),
-    ];
-
-    setSavedReadings(combined);
+    setSavedReadings(databaseReadings);
   } catch (error) {
     console.error(error);
-
-    // Fall back to localStorage if Supabase is unavailable.
-    setSavedReadings(getSavedReadings());
+    setSavedReadings([]);
   }
 }
-
 useEffect(() => {
   return () => {
     if (notesSaveTimer.current) {
@@ -147,8 +152,6 @@ async function updateReadingInDatabase(
 
       setReading(data);
 
-saveReading(data);
-
 try {
   await saveReadingToDatabase(data);
 } catch (error) {
@@ -222,7 +225,7 @@ function changeNotes(notes: string) {
   };
 
   setReading(updatedReading);
-  updateReadingNotes(reading.id, notes);
+  
 
   if (notesSaveTimer.current) {
     clearTimeout(notesSaveTimer.current);
@@ -238,16 +241,14 @@ function changeNotes(notes: string) {
   }, 800);
 }
 
-function removeReading(id: string) {
-  deleteReading(id);
-  setSavedReadings(getSavedReadings());
+async function removeReading(id: string) {
+  await deleteReadingFromDatabase(id);
+  await loadReadings();
 
   if (reading?.id === id) {
     setReading(null);
-    setView("library");
   }
 }
-
 
 async function changeStage(stage: Reading["stage"]) {
   if (!reading) {
@@ -260,7 +261,7 @@ async function changeStage(stage: Reading["stage"]) {
   };
 
   setReading(updatedReading);
-  updateReadingStage(reading.id, stage);
+
 
   try {
     await updateReadingInDatabase(reading.id, { stage });
@@ -273,6 +274,7 @@ async function changeStage(stage: Reading["stage"]) {
 
 return (
   <main className={styles.page}>
+<AuthPanel />
     {/* This branding appears on every view */}
     <header className={styles.brand}>
       <p className={styles.eyebrow}>

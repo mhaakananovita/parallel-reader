@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 import type { Reading } from "@/lib/types";
 
 export async function GET() {
   try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated." },
+        { status: 401 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("readings")
       .select("*")
@@ -13,18 +26,17 @@ export async function GET() {
       throw error;
     }
 
-const readings = data.map((row) => ({
-  id: row.id,
-  title: row.title,
-  sourceLanguage: row.source_language,
-  translationLanguage: row.translation_language,
-  stage: row.stage,
-  notes: row.notes,
-  blocks: row.blocks,
-}));
+    const readings = data.map((row) => ({
+      id: row.id,
+      title: row.title,
+      sourceLanguage: row.source_language,
+      translationLanguage: row.translation_language,
+      stage: row.stage,
+      notes: row.notes,
+      blocks: row.blocks,
+    }));
 
-return NextResponse.json(readings);
-
+    return NextResponse.json(readings);
   } catch (error) {
     console.error("Failed to load readings:", error);
 
@@ -37,12 +49,26 @@ return NextResponse.json(readings);
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated." },
+        { status: 401 }
+      );
+    }
+
     const reading = (await request.json()) as Reading;
 
     const { data, error } = await supabase
       .from("readings")
       .insert({
         id: reading.id,
+        user_id: user.id,
         title: reading.title,
         source_language: reading.sourceLanguage,
         translation_language: reading.translationLanguage,
@@ -70,6 +96,19 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated." },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     const { id, stage, notes } = body;
@@ -114,6 +153,58 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json(
       { error: "Failed to update reading." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated." },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Reading id is required." },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+  .from("readings")
+  .delete()
+  .eq("id", id)
+  .select("id");
+
+    if (error) {
+      throw error;
+    }
+
+if (!data || data.length === 0) {
+  return NextResponse.json(
+    { error: "Reading not found or not permitted." },
+    { status: 404 }
+  );
+}
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete reading:", error);
+
+    return NextResponse.json(
+      { error: "Failed to delete reading." },
       { status: 500 }
     );
   }

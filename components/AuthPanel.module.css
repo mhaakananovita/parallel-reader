@@ -1,0 +1,101 @@
+.panel {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.signIn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.help {
+  margin: 0.25rem 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+}
+
+.button,
+.secondaryButton {
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.button {
+  border: 1px solid #222;
+  background: #222;
+  color: white;
+}
+
+.secondaryButton {
+  border: 1px solid #ccc;
+  background: #f7f7f5;
+  color: #222;
+}
+
+.button:disabled,
+.secondaryButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.message {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.signedIn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.statusLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.email {
+  display: block;
+  font-weight: 600;
+}
+
+.status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .signedIn {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .button,
+  .secondaryButton {
+    width: 100%;
+  }
+}
