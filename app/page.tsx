@@ -193,7 +193,7 @@ return (
       <button
         className={view === "new" ? styles.activeNav : ""}
         onClick={() => {
-          setTopic("");
+          setTopic("Everyday life");
           setLevel("");
           setView("new");
         }}

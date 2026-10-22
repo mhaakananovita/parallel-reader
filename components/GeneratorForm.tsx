@@ -53,7 +53,7 @@ export default function GeneratorForm({
 
 <div className={styles.field}>
   <label>
-    Topic
+    Topic/subject
     <select
       value={topic}
       onChange={(event) => onTopicChange(event.target.value)}
