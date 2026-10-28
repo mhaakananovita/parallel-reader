@@ -19,6 +19,7 @@ export type Reading = {
   notes: string;
   blocks: ReadingBlock[];
 level: string;
+audioPath?: string | null;
 };
 
 export type GenerateReadingRequest = {

@@ -19,7 +19,8 @@ export default function Reader({
   onStageChange,
   onNotesChange,
 }: ReaderProps) {
-const [notesOpen, setNotesOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+
   return (
     <section className={styles.reader}>
       <h2 className={styles.title}>{reading.title}</h2>
@@ -36,7 +37,9 @@ const [notesOpen, setNotesOpen] = useState(false);
           >
             <option value="new">New</option>
             <option value="shadowing">Shadowing</option>
-            <option value="parallel-reading">Parallel reading</option>
+            <option value="parallel-reading">
+              Parallel reading
+            </option>
             <option value="analysis">Analysis</option>
             <option value="review">Review</option>
           </select>
@@ -44,45 +47,57 @@ const [notesOpen, setNotesOpen] = useState(false);
       </div>
 
       <button
-  className={styles.notesButton}
-  onClick={() => setNotesOpen(true)}
-  type="button"
->
-  Notes
-</button>
-
-{notesOpen && (
-  <div className={styles.notesPanel}>
-    <div className={styles.notesPanelHeader}>
-      <h3>Notes</h3>
-
-      <button
-  className={styles.closeButton}
+        className={styles.notesButton}
+        onClick={() => setNotesOpen(true)}
         type="button"
-        onClick={() => setNotesOpen(false)}
       >
-        Close
+        Notes
       </button>
-    </div>
 
-    <textarea
-      value={reading.notes}
-      onChange={(event) => onNotesChange(event.target.value)}
-      rows={12}
-      placeholder="Add notes about this reading..."
-    />
-  </div>
-)}
+      {notesOpen && (
+        <div className={styles.notesPanel}>
+          <div className={styles.notesPanelHeader}>
+            <h3>Notes</h3>
+
+            <button
+              className={styles.closeButton}
+              type="button"
+              onClick={() => setNotesOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+
+          <textarea
+            value={reading.notes ?? ""}
+            onChange={(event) =>
+              onNotesChange(event.target.value)
+            }
+            rows={12}
+            placeholder="Add notes about this reading..."
+          />
+        </div>
+      )}
 
       <div className={styles.audio}>
-        <button onClick={onGenerateAudio} disabled={audioLoading}>
-          {audioLoading
-            ? "Generating audio..."
-            : `Generate ${reading.sourceLanguage} audio`}
-        </button>
+        {!audioUrl && (
+          <button
+            type="button"
+            onClick={onGenerateAudio}
+            disabled={audioLoading}
+          >
+            {audioLoading
+              ? "Generating audio..."
+              : `Generate ${reading.sourceLanguage} audio`}
+          </button>
+        )}
 
         {audioUrl && (
-          <audio controls src={audioUrl}>
+          <audio
+            controls
+            preload="metadata"
+            src={audioUrl}
+          >
             Your browser does not support audio playback.
           </audio>
         )}

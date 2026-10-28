@@ -26,15 +26,16 @@ export async function GET() {
       throw error;
     }
 
-    const readings = data.map((row) => ({
-      id: row.id,
-      title: row.title,
-      sourceLanguage: row.source_language,
-      translationLanguage: row.translation_language,
-      stage: row.stage,
-      notes: row.notes,
-      blocks: row.blocks,
-    }));
+const readings = data.map((row) => ({
+  id: row.id,
+  title: row.title,
+  sourceLanguage: row.source_language,
+  translationLanguage: row.translation_language,
+  stage: row.stage,
+  notes: row.notes,
+  blocks: row.blocks,
+  audioPath: row.audio_path,
+}));
 
     return NextResponse.json(readings);
   } catch (error) {
