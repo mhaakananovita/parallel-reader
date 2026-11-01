@@ -72,6 +72,7 @@ export default function Library({
               Parallel reading
             </option>
             <option value="analysis">Analysis</option>
+            <option value="scriptorium">Scriptorium</option>
             <option value="review">Review</option>
           </select>
         </label>

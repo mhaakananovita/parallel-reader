@@ -201,3 +201,60 @@ right: 1.5rem
 .closeButton:hover {
   background: #ececea;
 }
+
+.sourceOnly {
+  grid-template-columns: 1fr;
+}
+
+.translationButton {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #d6d6d6;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.translationButton:hover {
+  background: #f5f5f5;
+}
+
+.translationButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.quizArea {
+  margin-top: 2rem;
+}
+
+.quizButton {
+  padding: 0.65rem 1rem;
+  border: 1px solid #cfcfcf;
+  border-radius: 999px;
+  background: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.quizButton:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #b8b8b8;
+}
+
+.quizButton:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.quizButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

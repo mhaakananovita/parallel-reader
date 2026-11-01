@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
-import type { Reading } from "@/lib/types";
+import type { Quiz, Reading } from "@/lib/types";
 import GeneratorForm from "@/components/GeneratorForm";
 import Library from "@/components/Library";
 import Reader from "@/components/Reader";
@@ -12,7 +12,8 @@ type View = "home" | "library" | "new" | "reader";
 
 export default function Home() {
   const [sourceLanguage, setSourceLanguage] = useState("French");
-  const [translationLanguage, setTranslationLanguage] = useState("Swedish");
+  const [translationLanguage, setTranslationLanguage] =
+    useState("Swedish");
   const [level, setLevel] = useState("");
   const [topic, setTopic] = useState("Everyday life");
   const [view, setView] = useState<View>("home");
@@ -22,10 +23,56 @@ export default function Home() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [audioLoading, setAudioLoading] = useState(false);
+
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quizLoading, setQuizLoading] = useState(false);
 
   const notesSaveTimer =
     useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function generateQuiz() {
+    if (!reading) {
+      return;
+    }
+
+    setQuizLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/quiz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sourceLanguage: reading.sourceLanguage,
+          blocks: reading.blocks,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ?? "Failed to generate quiz."
+        );
+      }
+
+      setQuiz(data);
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Failed to generate quiz.");
+      }
+    } finally {
+      setQuizLoading(false);
+    }
+  }
 
   async function deleteReadingFromDatabase(id: string) {
     const response = await fetch("/api/readings", {
@@ -51,10 +98,13 @@ export default function Home() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to load readings from database.");
+        throw new Error(
+          "Failed to load readings from database."
+        );
       }
 
-      const databaseReadings = (await response.json()) as Reading[];
+      const databaseReadings =
+        (await response.json()) as Reading[];
 
       setSavedReadings(databaseReadings);
     } catch (error) {
@@ -85,7 +135,9 @@ export default function Home() {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to save reading to database.");
+      throw new Error(
+        "Failed to save reading to database."
+      );
     }
   }
 
@@ -108,16 +160,21 @@ export default function Home() {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update reading in database.");
+      throw new Error(
+        "Failed to update reading in database."
+      );
     }
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     setLoading(true);
     setError("");
     setReading(null);
+    setQuiz(null);
 
     try {
       const response = await fetch("/api/generate", {
@@ -136,10 +193,13 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Something went wrong.");
+        throw new Error(
+          data.error ?? "Something went wrong."
+        );
       }
 
       setReading(data);
+      setQuiz(null);
 
       try {
         await saveReadingToDatabase(data);
@@ -188,7 +248,9 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Failed to generate audio.");
+        throw new Error(
+          data.error ?? "Failed to generate audio."
+        );
       }
 
       setReading((current) =>
@@ -230,14 +292,20 @@ export default function Home() {
       clearTimeout(notesSaveTimer.current);
     }
 
-    notesSaveTimer.current = setTimeout(async () => {
-      try {
-        await updateReadingInDatabase(reading.id, { notes });
-        await loadReadings();
-      } catch (error) {
-        console.error(error);
-      }
-    }, 800);
+    notesSaveTimer.current = setTimeout(
+      async () => {
+        try {
+          await updateReadingInDatabase(reading.id, {
+            notes,
+          });
+
+          await loadReadings();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      800
+    );
   }
 
   async function removeReading(id: string) {
@@ -246,10 +314,13 @@ export default function Home() {
 
     if (reading?.id === id) {
       setReading(null);
+      setQuiz(null);
     }
   }
 
-  async function changeStage(stage: Reading["stage"]) {
+  async function changeStage(
+    stage: Reading["stage"]
+  ) {
     if (!reading) {
       return;
     }
@@ -262,7 +333,9 @@ export default function Home() {
     setReading(updatedReading);
 
     try {
-      await updateReadingInDatabase(reading.id, { stage });
+      await updateReadingInDatabase(reading.id, {
+        stage,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -274,31 +347,39 @@ export default function Home() {
     <main className={styles.page}>
       <AuthPanel />
 
-      {/* This branding appears on every view */}
       <header className={styles.brand}>
         <p className={styles.eyebrow}>
           Language learning, stripped down
         </p>
+
         <h1>EchoText</h1>
       </header>
 
       <nav className={styles.nav}>
         <button
-          className={view === "home" ? styles.activeNav : ""}
+          className={
+            view === "home" ? styles.activeNav : ""
+          }
           onClick={() => setView("home")}
         >
           Home
         </button>
 
         <button
-          className={view === "library" ? styles.activeNav : ""}
+          className={
+            view === "library"
+              ? styles.activeNav
+              : ""
+          }
           onClick={() => setView("library")}
         >
           Library
         </button>
 
         <button
-          className={view === "new" ? styles.activeNav : ""}
+          className={
+            view === "new" ? styles.activeNav : ""
+          }
           onClick={() => {
             setTopic("Everyday life");
             setLevel("");
@@ -309,19 +390,20 @@ export default function Home() {
         </button>
       </nav>
 
-      {/* Everything below here appears ONLY on Home */}
       {view === "home" && (
         <section className={styles.home}>
           <div className={styles.hero}>
             <p className={styles.lead}>
-              Read a text. Compare it with a translation. Listen to it.
-              Come back to it a few times. That&apos;s basically the idea.
+              Read a text. Compare it with a translation.
+              Listen to it. Come back to it a few times.
+              That&apos;s basically the idea.
             </p>
 
             <p>
-              EchoText is a deliberately simple tool for learning languages
-              through reading, listening and repetition — without turning
-              every sentence into a quiz.
+              EchoText is a deliberately simple tool for
+              learning languages through reading, listening
+              and repetition — without turning every sentence
+              into an exercise.
             </p>
           </div>
 
@@ -349,12 +431,31 @@ export default function Home() {
             <h2>What it does</h2>
 
             <ul>
-              <li>Creates short texts at roughly the level you choose.</li>
-              <li>Shows source text and translation side by side.</li>
-              <li>Generates audio for listening and shadowing.</li>
-              <li>Saves readings so you can return to them later.</li>
               <li>
-                Lets you keep simple notes and track where you are with a text.
+                Creates short texts at roughly the level you
+                choose.
+              </li>
+
+              <li>
+                Shows source text and translation side by side.
+              </li>
+
+              <li>
+                Generates audio for listening and shadowing.
+              </li>
+
+              <li>
+                Saves readings so you can return to them later.
+              </li>
+
+              <li>
+                Lets you keep simple notes and track where you
+                are with a text.
+              </li>
+
+              <li>
+                Can generate an optional comprehension quiz for
+                a reading.
               </li>
             </ul>
           </div>
@@ -363,46 +464,63 @@ export default function Home() {
             <h2>Small FAQ</h2>
 
             <details>
-              <summary>Is this another language-learning course?</summary>
+              <summary>
+                Is this another language-learning course?
+              </summary>
+
               <p>
-                No. It does not teach a fixed curriculum. Think of it more
-                as a reading and listening workbench.
+                No. It does not teach a fixed curriculum. Think
+                of it more as a reading and listening workbench.
               </p>
             </details>
 
             <details>
-              <summary>Does it explain every word?</summary>
+              <summary>
+                Does it explain every word?
+              </summary>
+
               <p>
-                Nope. The translation is there when you need it, but the
-                point is to spend time with the text rather than click every
-                unfamiliar word.
+                Nope. The translation is there when you need it,
+                but the point is to spend time with the text
+                rather than click every unfamiliar word.
               </p>
             </details>
 
             <details>
-              <summary>Are there quizzes, streaks and points?</summary>
+              <summary>
+                Are there quizzes, streaks and points?
+              </summary>
+
               <p>
-                Not at the moment, and that is fairly intentional. Reading
-                a decent story is allowed to be enough.
+                There is an optional comprehension quiz for each
+                reading, but no points, streaks or progress
+                scoring.
               </p>
             </details>
 
             <details>
-              <summary>Is the translation always perfect?</summary>
+              <summary>
+                Is the translation always perfect?
+              </summary>
+
               <p>
-                No. The texts and translations are AI-generated, so
-                occasional oddities are possible. Treat them as learning
-                material, not sacred scripture.
+                No. The texts and translations are AI-generated,
+                so occasional oddities are possible. Treat them
+                as learning material, not sacred scripture.
               </p>
             </details>
 
             <details>
-              <summary>What is it actually good for?</summary>
+              <summary>
+                What is it actually good for?
+              </summary>
+
               <p>
-                Repeated reading, listening, shadowing and getting comfortable
-                with real sentences in context — especially when used alongside
-                grammars, exercise books and other less glamorous but useful
-                things.
+                Repeated reading, listening, shadowing and
+                getting comfortable with real sentences in
+                context — especially when used alongside
+                grammars, exercise books and other less
+                glamorous but useful things.
               </p>
             </details>
           </div>
@@ -414,6 +532,7 @@ export default function Home() {
           readings={savedReadings}
           onSelect={(selectedReading) => {
             setReading(selectedReading);
+            setQuiz(null);
             setView("reader");
           }}
           onDelete={removeReading}
@@ -428,7 +547,9 @@ export default function Home() {
           level={level}
           loading={loading}
           onSourceLanguageChange={setSourceLanguage}
-          onTranslationLanguageChange={setTranslationLanguage}
+          onTranslationLanguageChange={
+            setTranslationLanguage
+          }
           onTopicChange={setTopic}
           onLevelChange={setLevel}
           onSubmit={handleSubmit}
@@ -444,7 +565,10 @@ export default function Home() {
               : null
           }
           audioLoading={audioLoading}
+          quiz={quiz}
+          quizLoading={quizLoading}
           onGenerateAudio={generateAudio}
+          onGenerateQuiz={generateQuiz}
           onStageChange={changeStage}
           onNotesChange={changeNotes}
         />
@@ -455,6 +579,7 @@ export default function Home() {
           readings={savedReadings}
           onSelect={(selectedReading) => {
             setReading(selectedReading);
+            setQuiz(null);
             setView("reader");
           }}
           onDelete={removeReading}

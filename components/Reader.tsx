@@ -1,12 +1,16 @@
-import type { Reading } from "@/lib/types";
+import type { Quiz as QuizType, Reading } from "@/lib/types";
 import styles from "./Reader.module.css";
 import { useState } from "react";
+import Quiz from "@/components/Quiz";
 
 type ReaderProps = {
   reading: Reading;
   audioUrl: string | null;
   audioLoading: boolean;
+  quiz: QuizType | null;
+  quizLoading: boolean;
   onGenerateAudio: () => void;
+  onGenerateQuiz: () => void;
   onStageChange: (stage: Reading["stage"]) => void;
   onNotesChange: (notes: string) => void;
 };
@@ -15,11 +19,15 @@ export default function Reader({
   reading,
   audioUrl,
   audioLoading,
+  quiz,
+  quizLoading,
   onGenerateAudio,
+  onGenerateQuiz,
   onStageChange,
   onNotesChange,
 }: ReaderProps) {
   const [notesOpen, setNotesOpen] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(true);
 
   return (
     <section className={styles.reader}>
@@ -41,6 +49,7 @@ export default function Reader({
               Parallel reading
             </option>
             <option value="analysis">Analysis</option>
+            <option value="scriptorium">Scriptorium</option>
             <option value="review">Review</option>
           </select>
         </div>
@@ -103,18 +112,64 @@ export default function Reader({
         )}
       </div>
 
+      <button
+        className={styles.translationButton}
+        type="button"
+        onClick={() =>
+          setShowTranslation((current) => !current)
+        }
+      >
+        {showTranslation
+          ? "Hide translation"
+          : "Show translation"}
+      </button>
+
       <div className={styles.languageHeaders}>
         <strong>{reading.sourceLanguage}</strong>
-        <strong>{reading.translationLanguage}</strong>
+
+        {showTranslation && (
+          <strong>{reading.translationLanguage}</strong>
+        )}
       </div>
 
       <div className={styles.reading}>
         {reading.blocks.map((block, index) => (
-          <div className={styles.block} key={index}>
+          <div
+            className={`${styles.block} ${
+              !showTranslation ? styles.sourceOnly : ""
+            }`}
+            key={index}
+          >
             <p>{block.source}</p>
-            <p>{block.translation}</p>
+
+            {showTranslation && (
+              <p>{block.translation}</p>
+            )}
           </div>
         ))}
+      </div>
+
+      <div className={styles.quizArea}>
+        {!quiz && (
+          <button 
+  className={styles.quizButton}
+            type="button"
+            onClick={onGenerateQuiz}
+            disabled={quizLoading}
+          >
+            {quizLoading
+              ? "Generating quiz..."
+              : "Quiz this reading"}
+          </button>
+        )}
+
+        {quiz && (
+          <Quiz
+            quiz={quiz}
+            onTryAnother={onGenerateQuiz}
+            loading={quizLoading}
+          />
+        )}
       </div>
     </section>
   );

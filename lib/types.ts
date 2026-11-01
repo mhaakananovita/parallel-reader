@@ -28,3 +28,13 @@ export type GenerateReadingRequest = {
   topic: string;
   level?: string;
 };
+
+export type QuizQuestion = {
+  question: string;
+  options: [string, string, string];
+  correctIndex: number;
+};
+
+export type Quiz = {
+  questions: QuizQuestion[];
+};
